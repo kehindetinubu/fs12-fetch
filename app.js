@@ -80,6 +80,7 @@ let url = `https://prismix.dev/api/v1/statuses`;
 	? Fetch with Async Await Try Catch
 */
 
+/*
 let getData = async url => {
 	try
     {
@@ -93,10 +94,11 @@ let getData = async url => {
 		console.log(err);
 	}
 };
+*/
 
 // ? This returns a Promise again
 // to use it, either use resolvers or throw inside another async function
-console.log(getData(url))
+//console.log(getData(url))
 // getData(url);
 
 
@@ -112,3 +114,68 @@ console.log(getData(url))
 		* add an input field
 		* as you type, the search removes all irrelevant blocks
 */
+
+let getData = async url => {
+	try {
+		let res = await fetch(url);
+		let data = await res.json();
+		render(data.services)
+	} catch (err) {
+		console.log(err);
+	}
+};
+
+let render = (data) => {
+	console.log(data)
+	let main = document.querySelector("main")
+	data.forEach(d => {
+		let div = document.createElement("div")
+		div.className = "card"
+		let h5name = document.createElement("h5")
+		h5name.textContent = d.id
+		let pDesc = document.createElement("p")
+		pDesc.textContent = d.description
+		let pDate = document.createElement("p")
+		pDate.textContent = d.updatedAt
+		let divIssues = document.createElement("div")
+		let pIssue = document.createElement("p")
+
+		// if (d.recentIncidentBriefs)
+		// {
+		// 	d.recentIncidentBriefs.forEach(i => console.log(i))
+		// }
+
+		// ? Optional Chaining Operator - checks if not null/undefined before running
+		// d.recentIncidentBriefs?.forEach(i => console.log(i))
+
+		d.recentIncidentBriefs?.forEach(i => {
+			let pInc = document.createElement("p")
+			pInc.textContent = `Impact: ${i.impact} Name: ${i.name}`
+			divIssues.append(pInc)
+		})
+
+		div.append(h5name, pDesc, pDate, divIssues)
+		main.appendChild(div)
+	})
+}
+
+getData(url)
+
+let search = document.querySelector("input")
+
+search.addEventListener("keyup", (e) => {
+	let searchTerm = e.target.value.toLowerCase()
+	let cards = document.querySelectorAll(".card")
+	cards.forEach(card => {
+		let allCardText = card.innerText.toLowerCase()
+		if (!allCardText.includes(searchTerm))
+		{
+			card.style.display = "none"
+		} 
+		else
+		{
+			card.style.display = "flex"
+		}
+	})
+})
+
